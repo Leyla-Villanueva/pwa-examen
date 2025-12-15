@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link rel="apple-touch-icon" href="./image/icons/192.png" sizes="192x192">
+    <link rel="manifest" href="./manifest.webmanifest">
+
+    <title>PWA Cámara + Geolocalización</title>
+
+    <style>
+        :root{
+            --bg:#d6d6d6;
+            --card:#922b2b;
+            --accent:#ffffff;
+            --muted:#94a3b8;
+            --glass: rgba(255,255,255,0.05);
+        }
+
+        html,body{
+            height:100%;
+            margin:0;
+            font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;
+            background:linear-gradient(180deg,#071126 0%, #0b1a2b 100%);
+            color:#e6eef8
+        }
+
+        .app{
+            max-width:1100px;
+            margin:28px auto;
+            padding:20px
+        }
+
+        header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:20px
+        }
+
+        header h1{
+            font-size:1.3rem;
+            margin:0
+        }
+
+        button{
+            background:var(--card);
+            color:#fff;
+            border:none;
+            padding:10px 14px;
+            border-radius:10px;
+            cursor:pointer
+        }
+
+        button:disabled{
+            opacity:.5;
+            cursor:not-allowed
+        }
+
+        .layout{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:20px
+        }
+
+        @media(max-width:900px){
+            .layout{
+                grid-template-columns:1fr
+            }
+        }
+
+        .card{
+            background:var(--glass);
+            border-radius:14px;
+            padding:16px
+        }
+
+        /* ===== CÁMARA ===== */
+        #cameraContainer{
+            display:flex;
+            flex-direction:column;
+            align-items:center
+        }
+
+        video{
+            width:100%;
+            max-height:420px;
+            border-radius:10px;
+            background:#000
+        }
+
+        .camera-actions{
+            display:flex;
+            gap:10px;
+            margin-top:12px
+        }
+
+        #photoGallery{
+            display:flex;
+            gap:10px;
+            overflow-x:auto;
+            margin-top:10px
+        }
+
+        #photoGallery img{
+            height:90px;
+            border-radius:8px;
+            cursor:pointer
+        }
+
+        .empty{
+            color:var(--muted);
+            font-size:0.9rem
+        }
+
+        .label{
+            color:var(--muted)
+        }
+
+        a{
+            color:#60a5fa
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <h1>PWA Fotos y Geolocalización</h1>
+    <br><br>
+    <p>
+    Esta aplicación obtiene tu ubicación usando la
+    Geolocation API. Los botones de abrir y cerrar camara
+    te ayudaran a poder activar este recurso</template>
+  </p>
+
+    <header>
+        <div>
+            <button id="openCamera">Abrir cámara</button>
+            <button id="switchCamera" style="display:none">Cambiar cámara</button>
+            <button id="closeCamera" style="display:none">Cerrar cámara</button>
+        </div>
+    </header>
+
+    <main class="layout">
+     
+        <section class="card">
+            <h2>Cámara</h2>
+
+            <div id="cameraContainer">
+                <video id="video" autoplay playsinline muted></video>
+
+                <div class="camera-actions">
+                    <button id="takePhoto">Tomar foto</button>
+                       <div id="locationStatus" style="margin-left:10px;color:var(--muted);font-size:0.9rem;align-self:center">Ubicación: —</div>
+                    <p>
+                        <a id="link-maps" href="#" target="_blank" style="display:none;">
+                        Click para ver en google maps
+                        </a>
+                    </p>
+                </div>
+
+                <div id="photoGallery">
+                    <div class="empty" id="emptyMsg">
+                        Aun no se registran fotos. Toma una
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="card">
+            <h2>Geolocalización</h2>
+            <br><br>
+            <p>
+                Obten la localización para poder visualizar el link
+                de google maps correspondiente a la ubicación de la
+                fotografía tomada
+            </p>
+
+            <button id="btn-ubicacion">Obtener / Ver ubicación</button>
+            <button id="btn-detener" disabled>Detener seguimiento</button>
+
+            <p><span class="label">Permisos:</span> <span id="permiso">desconocido</span></p>
+            <p><span class="label">Latitud:</span> <span id="lat">-</span></p>
+            <p><span class="label">Longitud:</span> <span id="lng">-</span></p>
+            <p><span class="label">Precisión (m):</span> <span id="acc">-</span></p>
+            <p><span class="label">Última actualización:</span> <span id="timestamp">-</span></p>
+
+            <p>
+                <a id="link-maps" href="#" target="_blank" style="display:none;">
+                    Click para ver en google maps
+                </a>
+            </p>
+            
+            <p id="mensaje" style="color:#cfd0d2;"></p>
+        </section>
+
+    </main>
+
+    <canvas id="canvas" style="display:none"></canvas>
+</div>
+
+<script src="./app.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW registrado:', reg.scope))
+            .catch(err => console.error('SW error:', err));
+    });
+}
+</script>
+
+</body>
+</html>
